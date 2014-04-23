@@ -1,6 +1,5 @@
 package com.badlogic.drop;
-
-import javax.swing.text.html.HTMLDocument.Iterator;
+import java.util.Iterator;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -39,6 +38,11 @@ public class Drop implements ApplicationListener {
 	      dropImage = new Texture(Gdx.files.internal("droplet.png"));
 	      bucketImage = new Texture(Gdx.files.internal("bucket.png"));
 	      
+	      // create the camera and the SpriteBatch(lotes o montones)
+	      camera = new OrthographicCamera();
+	      camera.setToOrtho(false, 800, 480);
+	      batch = new SpriteBatch();
+	      
 	      // Cargar el efecto de sonido de la gota y el Fondo de la lluvia
 	      // load the drop sound effect and the rain background "music"
 	      dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -49,10 +53,7 @@ public class Drop implements ApplicationListener {
 	      rainMusic.setLooping(true);
 	      rainMusic.play();
 	      
-	      // create the camera and the SpriteBatch(lotes o montones)
-	      camera = new OrthographicCamera();
-	      camera.setToOrtho(false, 800, 480);
-	      batch = new SpriteBatch();
+	      
 	     
 	      // create a Rectangle to logically represent the bucket-
 	      //Crear un rectángulo para representar lógicamente el cubo
@@ -89,6 +90,7 @@ public class Drop implements ApplicationListener {
 	      Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 	     
 	      // tell the camera to update its matrices.
+	      // actualizar la camara cada frame
 	      camera.update();
 	      
 	      // tell the SpriteBatch to render in the
@@ -104,6 +106,9 @@ public class Drop implements ApplicationListener {
 	      batch.end();
 	      
 	      // process user input
+	      // Movimiento
+	      // Con este if moveremos el cubo donde estén tocando la pantalla,
+	      //como esto es del tutorial sólo lo movemos en X
 	      
 	      if(Gdx.input.isTouched()) {
 	    	    Vector3 touchPos = new Vector3();
@@ -111,7 +116,8 @@ public class Drop implements ApplicationListener {
 	    	    camera.unproject(touchPos);
 	    	    bucket.x = touchPos.x - 64 / 2;
 	    	    }
-	      
+	      // Con estos if, movemos el cubo si alguien toca las teclas izquierda o 
+	      //derecha.
 	       if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
 	       if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
 	       
@@ -126,7 +132,9 @@ public class Drop implements ApplicationListener {
 	       // move the raindrops, remove any that are beneath(debajo) the bottom edge(borde) of
 	       // the screen or that hit the bucket(cubo). In the later case we play back
 	       // a sound effect as well.
-	      Iterator<Rectangle> iter = raindrops.iterator();
+	       // Mover las gotas de agua por la pantalla y quitar las que entran en el cubo o bien
+	       // se salen de la pantalla. Reproducir sonido
+	      Iterator <Rectangle> iter = raindrops.iterator();
 	       while(iter.hasNext()) {
 	          Rectangle raindrop = iter.next();
 	          raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
